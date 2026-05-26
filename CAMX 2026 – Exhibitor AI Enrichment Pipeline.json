@@ -1,0 +1,969 @@
+{
+  "name": "CAMX 2026 – Exhibitor AI Enrichment Pipeline",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "44f1cff0-de07-4a81-88d4-470e0f30d180",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1Qx7K1002S4hW_K8qKQgEVGl97dlKaNqi",
+          "mode": "list",
+          "cachedResultName": "exhibitors_raw.json",
+          "cachedResultUrl": "https://drive.google.com/file/d/1Qx7K1002S4hW_K8qKQgEVGl97dlKaNqi/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "id": "8844c8c8-6b3e-4057-b21a-f3774049a919",
+      "name": "Google Drive – Download JSON",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -592,
+        64
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "1DsXEBFhqwrR0rMG",
+          "name": "Google Drive account"
+        }
+      },
+      "notes": "Upload exhibitors_raw.json to Google Drive first.\nGet the file ID from the share URL:\nhttps://drive.google.com/file/d/FILE_ID/view"
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "options": {}
+      },
+      "id": "036cc6dc-b42e-4932-9db4-e51336910e47",
+      "name": "Extract From File (JSON)",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        64
+      ],
+      "notes": "Converts the downloaded binary JSON into n8n items.\nEach item = one exhibitor record."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const r = (typeof item.json.data === 'object' && item.json.data !== null)\n    ? item.json.data\n    : {};\n\n  return {\n    json: {\n      exhid: r.exhid || '',\n      company_name: r.name || '',\n      booth: r.booth || 'NO_OUTPUT',\n      building: r.building || 'NO_OUTPUT',\n      address: r.address || 'NO_OUTPUT',\n      website: r.website || 'NO_OUTPUT',\n      phone: r.phone || 'NO_OUTPUT',\n      description: r.description || 'NO_OUTPUT',\n      product_categories: Array.isArray(r.product_categories)\n        ? r.product_categories.join(', ')\n        : 'NO_OUTPUT',\n      has_description: r.description ? 'YES' : 'NO',\n      missing_fields: Array.isArray(r.missing_fields)\n        ? r.missing_fields.join(', ')\n        : 'none',\n      detail_url: r.detail_url || ''\n    }\n  };\n});"
+      },
+      "id": "0529a03e-0bb8-4718-af3f-f831ca2add7c",
+      "name": "Format Row (no description)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        160
+      ],
+      "notes": "Formats a NO_OUTPUT row for Sheet 1.\nNo AI pipeline — these companies had no description."
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "183TK9QxsQUb2ru0l2t4wgpNZQNlkVkuaVIHqQufGxkE",
+          "mode": "list",
+          "cachedResultName": "exhibitors",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/183TK9QxsQUb2ru0l2t4wgpNZQNlkVkuaVIHqQufGxkE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "value": "Sheet1 - All Exhibitors",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "exhid"
+          ],
+          "schema": [
+            {
+              "id": "exhid",
+              "displayName": "exhid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "company_name",
+              "displayName": "company_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "booth",
+              "displayName": "booth",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "building",
+              "displayName": "building",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "product_categories",
+              "displayName": "product_categories",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "has_description",
+              "displayName": "has_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "missing_fields",
+              "displayName": "missing_fields",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "detail_url",
+              "displayName": "detail_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "id": "d5e0baa3-2305-4968-992a-44fe0843c732",
+      "name": "Sheet 1 → Append (no description)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        528,
+        160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kOvcgc1c5gtVRWOY",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "Replace YOUR_GOOGLE_SHEET_ID with your actual Sheet ID.\nColumns: exhid, company_name, booth, building, address,\ncity_state_zip, country, website, phone, description,\nproduct_categories, has_description, missing_fields, detail_url"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const r = (typeof item.json.data === 'object' && item.json.data !== null)\n    ? item.json.data\n    : {};\n\n  return {\n    json: {\n      exhid: r.exhid || '',\n      company_name: r.name || '',\n      booth: r.booth || 'NO_OUTPUT',\n      building: r.building || 'NO_OUTPUT',\n      address: r.address || 'NO_OUTPUT',\n      website: r.website || 'NO_OUTPUT',\n      phone: r.phone || 'NO_OUTPUT',\n      description: r.description || '',\n      product_categories: Array.isArray(r.product_categories)\n        ? r.product_categories.join(', ')\n        : 'NO_OUTPUT',\n      has_description: r.description ? 'YES' : 'NO',\n      missing_fields: Array.isArray(r.missing_fields)\n        ? r.missing_fields.join(', ')\n        : 'none',\n      detail_url: r.detail_url || ''\n    }\n  };\n});"
+      },
+      "id": "d0bd6b18-2c61-4d70-ba61-0ae7c5910f0c",
+      "name": "Format Row (has description)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        -32
+      ],
+      "notes": "Formats a complete row for Sheet 1.\nThis row has all scraped data — no AI line here."
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "183TK9QxsQUb2ru0l2t4wgpNZQNlkVkuaVIHqQufGxkE",
+          "mode": "list",
+          "cachedResultName": "exhibitors",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/183TK9QxsQUb2ru0l2t4wgpNZQNlkVkuaVIHqQufGxkE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "value": "Sheet1 - All Exhibitors",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "exhid"
+          ],
+          "schema": [
+            {
+              "id": "exhid",
+              "displayName": "exhid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "company_name",
+              "displayName": "company_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "booth",
+              "displayName": "booth",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "building",
+              "displayName": "building",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "product_categories",
+              "displayName": "product_categories",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "has_description",
+              "displayName": "has_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "missing_fields",
+              "displayName": "missing_fields",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "detail_url",
+              "displayName": "detail_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "handlingExtraData": "ignoreIt"
+        }
+      },
+      "id": "2a477a03-4ff4-40b8-91b6-62b5344b4953",
+      "name": "Sheet 1 → Append (has description)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        528,
+        -32
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kOvcgc1c5gtVRWOY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "id": "49f6eb59-dd0a-4003-8e03-5eac7c5f0ca3",
+      "name": "Split in Batches (10)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        752,
+        -32
+      ],
+      "notes": "Groups 10 companies per loop iteration.\n~40 total batches for 400 companies.\nKeeps API calls well under Groq's free 30 RPM limit."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all 10 items in this batch and build one prompt\nconst items = $input.all();\n\nconst companies = items.map((item, i) => {\n  const c = item.json;\n  const cats = (c.product_categories || '').replace('NO_OUTPUT', '') || 'N/A';\n  return [\n    `[${i + 1}] ${c.company_name}`,\n    `    Booth: ${c.booth !== 'NO_OUTPUT' ? c.booth : 'N/A'}`,\n    `    Description: ${c.description.slice(0, 300)}`,\n    `    Categories: ${cats}`\n  ].join('\\n');\n}).join('\\n\\n');\n\nconst prompt = `You are an elite B2B Sales Development Representative known for writing hyper-personalized, natural-sounding cold emails that get high reply rates. \n\nGenerate exactly ${items.length} personalized cold email opening lines for exhibitors attending the CAMX trade show.\n\nOUTPUT FORMAT:\nReturn ONLY a valid JSON array containing exactly ${items.length} strings, corresponding to the companies in the exact order provided. Do not use markdown formatting (no json). No explanations. No preamble.\n\nRULES FOR THE OPENING LINE:\n1. The Formula: [Specific Observation from their data] + [Dash/Hyphen] + [Curiosity about a business tension/problem].\n2. Specificity: Pick ONE very specific product, material, or use-case from their description. Ignore general company history (e.g., \"fifth-generation\") and strip away marketing fluff.\n3. Conversational Tone: Write exactly how a human speaks. Use natural transitions like \"— curious how...\", \"— wondering if...\", or \"— guessing you're seeing...\". \n4. Constraints:\n   - Length: 20-35 words maximum. 1 strict sentence (using a dash or comma to connect thoughts).\n   - NEVER start with filler like \"I saw\", \"I came across\", or \"Your blend of X raises a question\". \n   - NEVER use generic compliments (\"Love what you do\", \"Impressive work\").\n   - BANNED WORDS: innovative, comprehensive, premier, cutting-edge, delve, diverse, raises a question, tailored. \n\nEXAMPLES:\nBad: \"Loved what your company is doing with automated cutting.\"\nBad (AI-sounding): \"Your blend of hand-held cutters and automated systems raises a question about how you navigate tighter changeover times.\"\nGood: \"Noticed you're highlighting lightweight composite solutions at CAMX curious how you're positioning these for manufacturers looking to reduce production costs without compromising strength.\"\nGood: \"Saw your focus on fully automated plotting systems for industrial fabrics — wondering if your customers are prioritizing faster changeover times or lower maintenance costs right now.\"\n\nINPUT DATA:\n${companies}`;\n\n// Store batch metadata so we can re-map the response array later\nreturn [{\n  json: {\n    prompt,\n    batch_meta: items.map(item => item.json)\n  }\n}];"
+      },
+      "id": "da69d94b-87e7-49cc-be32-fe4ee9528846",
+      "name": "Build Batch Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        -160
+      ],
+      "notes": "Aggregates 10 items → 1 prompt string.\nAlso carries batch_meta so we can map response\nlines back to the right companies after the AI call."
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "hasOutputParser": true,
+        "needsFallback": true,
+        "messages": {
+          "messageValues": []
+        }
+      },
+      "id": "f6290068-a39a-4e54-94e4-a58dc86e5729",
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        1264,
+        -160
+      ],
+      "notes": "Connect a Groq Chat Model sub-node to this.\nIn n8n: click the + under this node → select 'Groq Chat Model'\nModel: llama-3.3-70b-versatile\nTemperature: 0.7\nMax tokens: 1200\n\nFree Groq API key: console.groq.com"
+    },
+    {
+      "parameters": {
+        "jsCode": "const lines = $json.output;\nconst batchMeta = $('Build Batch Prompt').first().json.batch_meta;\n\nreturn batchMeta.map((company, i) => ({\n  json: {\n    exhid:              company.exhid,\n    company_name:       company.company_name,\n    booth:              company.booth,\n    website:            company.website,\n    description:        company.description,\n    product_categories: company.product_categories,\n    personalized_line:  lines[i],\n    detail_url:         company.detail_url\n  }\n}));"
+      },
+      "id": "e35dd418-f9a5-40ef-a59d-46ba8d11f8a9",
+      "name": "Parse Response + Expand Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1664,
+        -160
+      ],
+      "notes": "Splits 1 AI response (JSON array of 10 lines)\nback into 10 individual n8n items.\nHandles markdown fences + fallback parsing."
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "id": "a23e00e1-8385-487f-988e-04f59afcfae0",
+      "name": "Wait 2s",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2112,
+        -32
+      ],
+      "webhookId": "34f59bc5-b8eb-42f1-85a0-cc701e8920e0",
+      "notes": "Groq free tier: 30 RPM.\n2s between batches = ~28 RPM effective.\nRemove this node if you upgrade to a paid plan."
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "183TK9QxsQUb2ru0l2t4wgpNZQNlkVkuaVIHqQufGxkE",
+          "mode": "list",
+          "cachedResultName": "exhibitors",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/183TK9QxsQUb2ru0l2t4wgpNZQNlkVkuaVIHqQufGxkE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "value": "Sheet2 - AI Personalized",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "exhid": "={{ $json.exhid }}",
+            "company_name": "={{ $json.company_name }}",
+            "booth": "={{ $json.booth }}",
+            "website": "={{ $json.website }}",
+            "description": "={{ $json.description }}",
+            "product_categories": "={{ $json.product_categories }}",
+            "personalized_line": "={{ $json.personalized_line }}",
+            "detail_url": "={{ $json.detail_url }}"
+          },
+          "matchingColumns": [
+            "exhid"
+          ],
+          "schema": [
+            {
+              "id": "exhid",
+              "displayName": "exhid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "company_name",
+              "displayName": "company_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "booth",
+              "displayName": "booth",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_categories",
+              "displayName": "product_categories",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "personalized_line",
+              "displayName": "personalized_line",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "detail_url",
+              "displayName": "detail_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "id": "976da474-5c6c-4393-9a14-d789cec39c42",
+      "name": "Sheet 2 → AI Personalized",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1888,
+        -160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kOvcgc1c5gtVRWOY",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "Sheet 2 only has companies with descriptions.\nColumns: exhid, company_name, booth, website,\ndescription, product_categories, personalized_line, detail_url"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        64
+      ],
+      "id": "3b9225d4-aa70-47c9-ab98-7a2c4d81a748",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.has_description }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "b30a63da-59c0-4d77-95a9-7faa5d2abceb"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "true"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c602f0a5-261e-4380-917f-a4a52f88394f",
+                    "leftValue": "={{ $json.data.has_description }}",
+                    "rightValue": false,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        64
+      ],
+      "id": "ca1cad98-4059-414c-a82a-cee8279a1c24",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {
+          "maxTokensToSample": 6000,
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        64
+      ],
+      "id": "ecebc5c1-8dd6-4585-b341-418fec79c457",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "zaMCxK0p4ObPiiJL",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"string\"\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1456,
+        64
+      ],
+      "id": "be4597cb-14f4-4316-8e23-91db8c96eaf9",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        64
+      ],
+      "id": "384a4eff-ac04-444b-9e7f-eaebb9606935",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6ZrjaxtvLD94p8Jk",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Drive – Download JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive – Download JSON": {
+      "main": [
+        [
+          {
+            "node": "Extract From File (JSON)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract From File (JSON)": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Row (no description)": {
+      "main": [
+        [
+          {
+            "node": "Sheet 1 → Append (no description)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Row (has description)": {
+      "main": [
+        [
+          {
+            "node": "Sheet 1 → Append (has description)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split in Batches (10)": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Build Batch Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Batch Prompt": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Parse Response + Expand Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Response + Expand Items": {
+      "main": [
+        [
+          {
+            "node": "Sheet 2 → AI Personalized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2s": {
+      "main": [
+        [
+          {
+            "node": "Split in Batches (10)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Format Row (has description)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Row (no description)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheet 1 → Append (has description)": {
+      "main": [
+        [
+          {
+            "node": "Split in Batches (10)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheet 2 → AI Personalized": {
+      "main": [
+        [
+          {
+            "node": "Wait 2s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7e3aabd6-0a39-4618-b7bb-d03d143b6ca7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "775bf8242f7fefa67382c5b7af5e98a8aee28dde750c87a777c253f700c632e6"
+  },
+  "id": "kKxHmIaviiOMXZ4I",
+  "tags": []
+}
