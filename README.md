@@ -13,7 +13,7 @@ scraper.py  (Python + Playwright)
                     ├── Extract From File → Split Out (one item per company)
                     ├── Switch (has_description?)
                     │     ├── YES → Format Row → Sheet 1 (all data)
-                    │     │            └── Split in Batches (5)
+                    │     │            └── Split in Batches (10)
                     │     │                  └── Build Batch Prompt
                     │     │                        └── Basic LLM Chain (Groq)
                     │     │                              └── Parse + Expand Items
@@ -33,7 +33,7 @@ Python handles scraping. n8n handles everything else — enrichment, AI generati
 |---|---|
 | Groq | llama-3.3-70b-versatile |
 
-Batching 5 companies per call keeps each request under the 8000 TPM limit.
+Batching 10 companies per call keeps each request under the 8000 TPM limit.
 ~62 total API calls for 312 companies with descriptions. Takes ~3 minutes.
 
 ---
@@ -92,11 +92,11 @@ Then set the following:
 - Document ID: your Sheet ID from Step 3
 
 **Split in Batches node**
-- Batch size: 5 (keeps requests under Groq's 8000 TPM limit)
+- Batch size: 10 (keeps requests under Groq's 8000 TPM limit)
 
 ---
 
-## Step 5 — Connect the loop
+## Step 10 — Connect the loop
 
 After importing, manually connect the **Wait 2s** output back to **Split in Batches (10)** to close the loop. n8n doesn't preserve this connection on import.
 
@@ -118,7 +118,7 @@ After importing, manually connect the **Wait 2s** output back to **Split in Batc
 | Split in Batches (10) | Groups 10 companies per AI call |
 | Build Batch Prompt | Aggregates 10 items into one prompt, stores `batch_meta` |
 | Basic LLM Chain | Sends prompt to Groq, returns JSON array of 10 lines |
-| Parse Response + Expand Items | Maps lines back to companies, expands to 5 items |
+| Parse Response + Expand Items | Maps lines back to companies, expands to 10 items |
 | Wait 2s | Rate limit buffer — then loops back to Split in Batches |
 | Sheet 2 → AI Personalized | Writes company + personalized line to Sheet 2 |
 
@@ -132,8 +132,8 @@ After importing, manually connect the **Wait 2s** output back to **Split in Batc
 |---|---|
 | exhid | Internal exhibitor ID |
 | company_name | Full company name |
-| booth | Booth code (e.g. N35) |
-| building | Full booth label (e.g. Building C, Level 1 — N35) |
+| booth | Booth code (e.g. N310) |
+| building | Full booth label (e.g. Building C, Level 1 — N310) |
 | address | Full address on one line (street, city/zip, country) |
 | website | Company website |
 | phone | Phone number |
