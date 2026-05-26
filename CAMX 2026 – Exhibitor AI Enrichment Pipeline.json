@@ -17,10 +17,10 @@
         "operation": "download",
         "fileId": {
           "__rl": true,
-          "value": "1Qx7K1002S4hW_K8qKQgEVGl97dlKaNqi",
+          "value": "YOUR_GOOGLE_DRIVE_FILE_ID_HERE",
           "mode": "list",
           "cachedResultName": "exhibitors_raw.json",
-          "cachedResultUrl": "https://drive.google.com/file/d/1Qx7K1002S4hW_K8qKQgEVGl97dlKaNqi/view?usp=drivesdk"
+          "cachedResultUrl": "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view?usp=drivesdk"
         },
         "options": {}
       },
@@ -74,10 +74,10 @@
         "operation": "appendOrUpdate",
         "documentId": {
           "__rl": true,
-          "value": "183TK9QxsQUb2ru0l2t4wgpNZQNlkVkuaVIHqQufGxkE",
+          "value": "YOUR_GOOGLE_SHEET_ID_HERE",
           "mode": "list",
           "cachedResultName": "exhibitors",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/183TK9QxsQUb2ru0l2t4wgpNZQNlkVkuaVIHqQufGxkE/edit?usp=drivesdk"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID_HERE/edit?usp=drivesdk"
         },
         "sheetName": {
           "value": "Sheet1 - All Exhibitors",
@@ -253,10 +253,10 @@
         "operation": "appendOrUpdate",
         "documentId": {
           "__rl": true,
-          "value": "183TK9QxsQUb2ru0l2t4wgpNZQNlkVkuaVIHqQufGxkE",
+          "value": "YOUR_GOOGLE_SHEET_ID_HERE",
           "mode": "list",
           "cachedResultName": "exhibitors",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/183TK9QxsQUb2ru0l2t4wgpNZQNlkVkuaVIHqQufGxkE/edit?usp=drivesdk"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID_HERE/edit?usp=drivesdk"
         },
         "sheetName": {
           "value": "Sheet1 - All Exhibitors",
@@ -495,10 +495,10 @@
         "operation": "appendOrUpdate",
         "documentId": {
           "__rl": true,
-          "value": "183TK9QxsQUb2ru0l2t4wgpNZQNlkVkuaVIHqQufGxkE",
+          "value": "YOUR_GOOGLE_SHEET_ID_HERE",
           "mode": "list",
           "cachedResultName": "exhibitors",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/183TK9QxsQUb2ru0l2t4wgpNZQNlkVkuaVIHqQufGxkE/edit?usp=drivesdk"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID_HERE/edit?usp=drivesdk"
         },
         "sheetName": {
           "value": "Sheet2 - AI Personalized",
